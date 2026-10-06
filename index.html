@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#102b3f">
+    <meta name="description" content="Um painel público para consultar indicadores do Brasil com contexto, metodologia e fontes verificáveis.">
+    <title>Ao Vivo Brasil — dados do país com contexto</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='13' fill='%23102b3f'/%3E%3Ccircle cx='20' cy='20' r='10' fill='%2312b8a6'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="src/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <header class="topbar">
+      <a class="brand" href="#inicio" aria-label="Ao Vivo Brasil, página inicial">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span class="brand-copy"><strong>ao vivo <b>brasil</b></strong><small>dados públicos, com contexto</small></span>
+      </a>
+      <div class="topbar-right">
+        <span class="integrity-pill"><span class="status-dot" aria-hidden="true"></span>Versão demonstrativa</span>
+        <a class="text-link methodology-link" href="#transparencia">Como lemos os dados <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <div class="shell" id="inicio">
+      <aside class="sidebar" aria-label="Navegação principal">
+        <div class="sidebar-heading">Explore o Brasil</div>
+        <nav class="main-nav" id="main-nav" aria-label="Módulos temáticos"></nav>
+        <div class="sidebar-bottom">
+          <div class="sidebar-note-icon" aria-hidden="true">i</div>
+          <p><strong>Transparência primeiro</strong><br>Todo indicador deve mostrar de onde veio e quando foi publicado.</p>
+          <a href="#transparencia" class="sidebar-link">Conheça os critérios <span aria-hidden="true">→</span></a>
+        </div>
+      </aside>
+
+      <main id="conteudo" tabindex="-1">
+        <section id="dashboard-view" aria-labelledby="page-title">
+          <div class="hero">
+            <div class="hero-content">
+              <div class="eyebrow"><span class="eyebrow-line"></span>OBSERVATÓRIO PÚBLICO · BRASIL</div>
+              <h1 id="page-title">O Brasil,<br><span>com contexto.</span></h1>
+              <p>Indicadores, território e decisões públicas em uma leitura clara e verificável.</p>
+              <div class="hero-actions">
+                <a class="button button-light" href="#indicadores">Explorar indicadores <span aria-hidden="true">↓</span></a>
+                <span class="hero-caption">Informação pública começa com uma boa fonte.</span>
+              </div>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+              <div class="country-token"><span class="token-pulse"></span><span>BR</span></div>
+              <div class="art-caption"><span class="art-caption-line"></span><span>um país<br>em perspectiva</span></div>
+              <div class="art-coordinate">15°46′ S&nbsp; 47°55′ O</div>
+            </div>
+            <div class="hero-meta" aria-label="Situação dos dados">
+              <div><span class="meta-label">Período de referência</span><strong>Varia por indicador</strong></div>
+              <div><span class="meta-label">Atualização dos dados</span><strong><span class="status-dot status-dot-muted"></span>Integrações pendentes</strong></div>
+              <div class="hero-demo-label"><span aria-hidden="true">✳</span> Sem dados atuais conectados</div>
+            </div>
+          </div>
+
+          <section class="section-block" id="indicadores" aria-labelledby="indicators-title">
+            <div class="section-heading">
+              <div><div class="section-kicker">ACOMPANHE</div><h2 id="indicators-title">Indicadores em foco</h2><p class="section-description">Os valores permanecem vazios enquanto as fontes oficiais não estiverem integradas.</p></div>
+              <label class="search-wrap" for="indicator-search"><span aria-hidden="true" class="search-icon"></span><span class="visually-hidden">Buscar indicador ou módulo</span><input id="indicator-search" type="search" placeholder="Buscar indicador" autocomplete="off"><kbd>/</kbd></label>
+            </div>
+            <div class="indicator-grid" id="indicator-grid"></div>
+          </section>
+
+          <section class="section-block overview-grid" aria-label="Séries e atualizações">
+            <article class="panel series-panel">
+              <div class="panel-head"><div><div class="section-kicker">SÉRIES OFICIAIS</div><h2>Indicadores em perspectiva</h2></div><span class="quiet-badge">Sem série conectada</span></div>
+              <div class="chart-empty">
+                <div class="chart-y-labels" aria-hidden="true"><span>—</span><span>—</span><span>—</span><span>—</span></div>
+                <div class="chart-canvas" aria-hidden="true"><span class="chart-gridline"></span><span class="chart-gridline"></span><span class="chart-gridline"></span><span class="chart-gridline"></span><span class="chart-empty-mark">···</span></div>
+                <div class="request-state-holder" id="series-request-state"></div>
+              </div>
+              <div class="chart-footer"><span>Período ainda não disponível</span><button class="inline-action" data-open-first-indicator>Ver uma ficha <span aria-hidden="true">→</span></button></div>
+            </article>
+            <article class="panel updates-panel">
+              <div class="panel-head"><div><div class="section-kicker">PLATAFORMA</div><h2>Atualizações recentes</h2></div><span class="update-icon" aria-hidden="true">↗</span></div>
+              <ul class="update-list" id="update-list"></ul>
+            </article>
+          </section>
+
+          <section class="section-block bottom-grid" aria-label="Legislativo e módulos">
+            <article class="panel legislative-panel" id="legislativo">
+              <div class="panel-head"><div><div class="section-kicker">ACOMPANHAMENTO LEGISLATIVO</div><h2>Pautas em destaque</h2></div><span class="fiction-badge"><span aria-hidden="true">◇</span> Exemplos fictícios</span></div>
+              <p class="panel-intro">Os cartões abaixo mostram como uma proposta será apresentada. Não correspondem a proposições reais.</p>
+              <div class="proposal-list" id="proposal-list"></div>
+              <button class="inline-action proposal-all" data-open-module="politica">Entenda o módulo de política <span aria-hidden="true">→</span></button>
+            </article>
+            <article class="panel topics-panel">
+              <div class="panel-head"><div><div class="section-kicker">NAVEGUE POR TEMA</div><h2>Um país, várias perspectivas</h2></div></div>
+              <p class="panel-intro">Cada módulo reúne definições, séries e fontes da área.</p>
+              <div class="topic-list" id="topic-list"></div>
+            </article>
+          </section>
+
+          <section class="section-block states-preview" aria-label="Recorte por unidade da Federação">
+            <div><div class="section-kicker">VISÃO TERRITORIAL</div><h2>O Brasil também se entende por estado.</h2><p>Consulte os recortes estaduais quando as séries comparáveis estiverem integradas.</p></div>
+            <button class="button button-outline" data-open-module="estados">Explorar estados <span aria-hidden="true">→</span></button>
+            <div class="states-watermark" aria-hidden="true">BR</div>
+          </section>
+        </section>
+
+        <section id="module-view" hidden aria-live="polite"></section>
+
+        <footer class="site-footer" id="transparencia">
+          <div class="footer-brand"><span class="brand-mark brand-mark-small" aria-hidden="true"><span></span></span><strong>Ao Vivo Brasil</strong></div>
+          <p>Dados públicos merecem contexto, método e caminho de volta à fonte.</p>
+          <div class="footer-links"><a href="#transparencia">Critérios editoriais</a><span aria-hidden="true">·</span><a href="#indicadores">Fichas de indicadores</a><span aria-hidden="true">·</span><span>Protótipo demonstrativo</span></div>
+        </footer>
+      </main>
+    </div>
+
+    <dialog class="detail-dialog" id="detail-dialog" aria-labelledby="dialog-title">
+      <form method="dialog"><button class="dialog-close" aria-label="Fechar detalhes">×</button></form>
+      <div class="dialog-content" id="dialog-content"></div>
+    </dialog>
+    <div class="sr-status" id="sr-status" role="status" aria-live="polite"></div>
+  </body>
+</html>
