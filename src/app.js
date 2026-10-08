@@ -330,7 +330,7 @@ async function refreshElectionSnapshot(coverage = selectedElectionCoverage, refr
     const announcement = byId("election-data-announcement");
     if (announcement) announcement.textContent = lastGood.stale
       ? "Fonte do TSE indisponível. A última resposta válida foi mantida e marcada como desatualizada."
-      : `Referências oficiais do primeiro turno atualizadas em ${formatBrasiliaDateTime(lastGood.checkedAt)}.`;
+      : `Consulta aos arquivos oficiais do TSE concluída em ${formatBrasiliaDateTime(lastGood.checkedAt)}. Os dados permanecem identificados por turno e período.`;
     updateElectionPolling(lastGood);
   } catch (error) {
     if (error.name === "AbortError" || sequence !== electionRequestSequence) return;
