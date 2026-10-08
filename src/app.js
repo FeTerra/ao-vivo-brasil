@@ -9,7 +9,11 @@ import {
 } from "./elections.js";
 import {
   renderCandidatePair,
+  renderCandidateResultsTable,
+  renderFirstRoundResultsArchive,
   renderElectionMetadata,
+  renderElectionMap,
+  renderGovernorFirstRoundResults,
   renderNoGovernorRunoffNotice,
   renderElectionStatesTable,
   renderElectionTotalizers,
@@ -185,14 +189,6 @@ function electionFailureMarkup(message) {
   return `<div class="election-source-error" role="alert"><span class="election-alert-symbol" aria-hidden="true">!</span><div><strong>Não foi possível atualizar os dados oficiais.</strong><p>${escapeHtml(message || "A conexão com a fonte do TSE falhou. Se houver uma resposta válida anterior, ela será preservada.")}</p><button class="button button-outline" type="button" data-election-retry>Tentar novamente</button></div></div>`;
 }
 
-function renderGovernorRunoffLinks(referenceStates) {
-  const confirmed = (referenceStates || []).filter((item) => item.governor?.status === "official" && item.governor.hasRunoff === true);
-  if (!confirmed.length) {
-    return `<div class="election-empty-state"><strong>Recortes estaduais em validação</strong><p>As unidades com segundo turno para governador são calculadas a partir dos votos válidos publicados pelo TSE; não há uma lista fixa nesta página.</p></div>`;
-  }
-  return `<ul class="election-runoff-list">${confirmed.map((item) => `<li><a href="${electionHashForCoverage(item.uf)}"><span>${escapeHtml(item.name)}</span><strong>${escapeHtml(item.uf)}</strong><span class="election-runoff-arrow" aria-hidden="true">→</span></a></li>`).join("")}</ul>`;
-}
-
 function renderElectionStatePage(snapshot, coverage) {
   const reference = snapshot.references ?? {};
   const live = snapshot.live ?? {};
@@ -202,6 +198,15 @@ function renderElectionStatePage(snapshot, coverage) {
   const presidentReference = reference.president;
   const presidentLive = live.president;
   const stateName = electionCoverageLabel(coverage);
+  const governorFirstRoundDetails = governor?.summary?.candidates?.length
+    ? renderFirstRoundResultsArchive(governor.summary, {
+      title: `Resultado completo · ${stateName}`,
+      office: `Governo de ${stateName}`,
+      sourceUrl: governor.sourceUrl,
+      publishedAt: governor.publication ? `${governor.publication.date} às ${governor.publication.time}` : null,
+      period: `Primeiro turno de 2026 · ${stateName}.`,
+    })
+    : "";
 
   let governorPanel;
   if (governor?.status === "official" && governor.hasRunoff === false) {
@@ -210,9 +215,18 @@ function renderElectionStatePage(snapshot, coverage) {
       stateName,
       sourceUrl: governor.sourceUrl,
       publishedAt: governor.publication ? `${governor.publication.date} às ${governor.publication.time}` : null,
-    });
+    }) + renderCandidatePair(governor.summary?.candidates, {
+      title: `Votação para governador · ${coverage}`,
+      eyebrow: "RESULTADO OFICIAL · 1º TURNO",
+      context: "Resultado final da primeira votação; este estado não terá disputa para governador no segundo turno.",
+      sourceUrl: governor.sourceUrl,
+      publishedAt: governor.publication ? `${governor.publication.date} às ${governor.publication.time}` : null,
+      period: "Primeiro turno de 2026; resultado oficial.",
+      frequency: "Arquivo final do primeiro turno; sem atualização periódica prevista.",
+      resultLabel: "Resultado do 1º turno",
+    }) + governorFirstRoundDetails;
   } else if (governor?.status === "official" && governor.hasRunoff === true) {
-    governorPanel = `${renderCandidatePair(governorLive?.candidates, { title: `Governador · ${coverage}`, eyebrow: "APURAÇÃO DO 2º TURNO", context: governorLive ? "Resultados oficiais da segunda votação nesta UF." : "A disputa para governador nesta UF foi identificada a partir do primeiro turno; o resultado do segundo turno ainda não foi publicado.", emptyMessage: "A apuração do segundo turno para governador ainda não começou ou o arquivo oficial desta UF ainda não está disponível.", sourceUrl: governorLive?.sourceUrl, publishedAt: governorLive?.publishedDate && governorLive?.publishedTime ? `${governorLive.publishedDate} às ${governorLive.publishedTime}` : null, period: "Segundo turno de 2026.", resultLabel: governorLive ? (governorLive.finalized ? "Totalização final" : "Em apuração") : "Aguardando votação" })}${renderElectionTotalizers(governorLive, { title: `Indicadores da apuração para governador · ${coverage}`, subtitle: "Totalizadores do segundo turno, separados da referência do primeiro turno." })}${renderCandidatePair(governor.candidates, { title: `Candidaturas ao governo de ${stateName}`, eyebrow: "GOVERNADOR · REFERÊNCIA DO 1º TURNO", context: "Candidaturas e números abaixo são do primeiro turno. A apuração desta segunda votação permanece em bloco separado.", sourceUrl: governor.sourceUrl, publishedAt: governor.publication ? `${governor.publication.date} às ${governor.publication.time}` : null, period: "Primeiro turno de 2026; referência oficial para a disputa estadual.", resultLabel: "Referência do 1º turno" })}`;
+    governorPanel = `${renderCandidatePair(governorLive?.candidates, { title: `Governador · ${coverage}`, eyebrow: "APURAÇÃO DO 2º TURNO", context: governorLive ? "Resultados oficiais da segunda votação nesta UF." : "A disputa para governador nesta UF foi identificada a partir do primeiro turno; o resultado do segundo turno ainda não foi publicado.", emptyMessage: "A apuração do segundo turno para governador ainda não começou ou o arquivo oficial desta UF ainda não está disponível.", sourceUrl: governorLive?.sourceUrl, publishedAt: governorLive?.publishedDate && governorLive?.publishedTime ? `${governorLive.publishedDate} às ${governorLive.publishedTime}` : null, period: "Segundo turno de 2026.", resultLabel: governorLive ? (governorLive.finalized ? "Totalização final" : "Em apuração") : "Aguardando votação" })}${renderElectionTotalizers(governorLive, { title: `Indicadores da apuração para governador · ${coverage}`, subtitle: "Totalizadores do segundo turno, separados da referência do primeiro turno." })}${renderCandidatePair(governor.candidates, { title: `Candidaturas ao governo de ${stateName}`, eyebrow: "GOVERNADOR · REFERÊNCIA DO 1º TURNO", context: "Candidaturas e números abaixo são do primeiro turno. A apuração desta segunda votação permanece em bloco separado.", sourceUrl: governor.sourceUrl, publishedAt: governor.publication ? `${governor.publication.date} às ${governor.publication.time}` : null, period: "Primeiro turno de 2026; referência oficial para a disputa estadual.", frequency: "Arquivo final do primeiro turno; sem atualização periódica prevista.", resultLabel: "Referência do 1º turno" })}${governorFirstRoundDetails}`;
   } else {
     governorPanel = `<section class="panel election-block"><div class="section-kicker">GOVERNO ESTADUAL · ${escapeHtml(coverage)}</div><h2>Elegibilidade aguardando validação oficial</h2><p>Este estado não será classificado até que o resultado oficial do primeiro turno para governador esteja disponível e totalizado.</p><div class="election-empty-state"><strong>Sem conclusão para este recorte</strong><p>Uma falha ou ausência de arquivo não será interpretada como confirmação ou ausência de segundo turno.</p></div>${renderElectionMetadata({ definition: "Segundo turno estadual quando nenhuma candidatura ultrapassa 50% dos votos válidos no primeiro turno.", unit: "Votos válidos.", period: "Primeiro turno de 2026.", sourceUrl: governor?.sourceUrl, publishedAt: null, notes: "A situação estadual será derivada dos arquivos oficiais do TSE. Dados ausentes não são tratados como resultado negativo." })}</section>`;
   }
@@ -220,9 +234,13 @@ function renderElectionStatePage(snapshot, coverage) {
   return `<div class="election-live-grid">
     ${renderCandidatePair(presidentLive?.candidates, { title: `Presidente · ${stateName}`, eyebrow: "APURAÇÃO DO 2º TURNO", context: presidentLive ? `Resultados oficiais do segundo turno no recorte ${stateName}.` : "Os números abaixo da referência não são resultados do segundo turno.", emptyMessage: "A apuração presidencial do segundo turno ainda não começou ou o arquivo oficial deste recorte ainda não está disponível.", sourceUrl: presidentLive?.sourceUrl, publishedAt: presidentLive?.publishedDate && presidentLive?.publishedTime ? `${presidentLive.publishedDate} às ${presidentLive.publishedTime}` : null, period: "Segundo turno de 2026.", resultLabel: presidentLive ? (presidentLive.finalized ? "Totalização final" : "Em apuração") : "Aguardando votação" })}
     ${renderElectionTotalizers(presidentLive, { title: `Indicadores presidenciais · ${stateName}`, subtitle: "Os totalizadores permanecem vazios até a divulgação do segundo turno pelo TSE." })}
-    ${renderCandidatePair(presidentReference?.candidates, { title: "Candidaturas presidenciais", eyebrow: "PRESIDENTE · REFERÊNCIA DO 1º TURNO", context: coverage === "EX" ? "Referência nacional do primeiro turno. No segundo turno, esta abrangência exibe apenas a disputa presidencial." : "Votação de primeiro turno para presidente neste recorte estadual.", sourceUrl: presidentReference?.sourceUrl, publishedAt: presidentReference?.publishedDate && presidentReference?.publishedTime ? `${presidentReference.publishedDate} às ${presidentReference.publishedTime}` : null, period: "Primeiro turno de 2026; referência oficial.", resultLabel: "Referência do 1º turno"})}
     ${coverage === "EX" ? `<section class="panel election-block"><div class="section-kicker">VOTO NO EXTERIOR</div><h2>Recorte presidencial</h2><p class="panel-intro">A abrangência Exterior está disponível para a disputa presidencial. Os campos específicos desse recorte serão preenchidos quando o arquivo correspondente do segundo turno estiver publicado e identificado na integração.</p>${renderElectionMetadata({ definition: "Votação presidencial por abrangência Exterior, conforme os arquivos de resultados do TSE.", unit: "Seções e votos.", period: "Segundo turno de 2026.", sourceUrl: presidentLive?.sourceUrl || presidentReference?.sourceUrl, publishedAt: null, notes: "O total nacional é apresentado separadamente; este recorte não deve ser somado novamente ao Brasil." })}</section>` : governorPanel}
-  </div>`;
+  </div>
+  <section class="election-first-round-section"><div class="panel-head"><div><div class="section-kicker">DADOS OFICIAIS · REFERÊNCIA</div><h2>Primeiro turno · ${escapeHtml(stateName)}</h2></div><span class="quiet-badge">Dados separados do 2º turno</span></div>
+    ${renderCandidatePair(presidentReference?.error ? [] : presidentReference?.candidates, { title: `Presidente · ${stateName}`, eyebrow: "RESULTADO OFICIAL · 1º TURNO", context: coverage === "EX" ? "Referência nacional da primeira votação; o arquivo específico do Exterior não é inferido." : "Votos e percentuais oficiais da primeira votação nesta abrangência.", sourceUrl: presidentReference?.sourceUrl, publishedAt: presidentReference?.publishedDate && presidentReference?.publishedTime ? `${presidentReference.publishedDate} às ${presidentReference.publishedTime}` : null, period: "Primeiro turno de 2026; resultado oficial.", frequency: "Arquivo final do primeiro turno; sem atualização periódica prevista.", resultLabel: "Resultado do 1º turno"})}
+    ${renderElectionTotalizers(presidentReference?.error ? null : presidentReference, { title: `Totalizadores presidenciais · ${stateName}`, subtitle: "Votação totalizada no primeiro turno; referência histórica para a próxima votação.", period: "Primeiro turno de 2026", frequency: "Arquivo final do primeiro turno; sem atualização periódica prevista." })}
+    ${renderCandidateResultsTable(presidentReference?.error ? [] : presidentReference?.candidates, { title: `Candidaturas presidenciais · ${stateName}`, sourceUrl: presidentReference?.sourceUrl, publishedAt: presidentReference?.publishedDate && presidentReference?.publishedTime ? `${presidentReference.publishedDate} às ${presidentReference.publishedTime}` : null, period: `Primeiro turno de 2026 · ${stateName}.`, collapsed: true })}
+  </section>`;
 }
 
 function renderElectionContent(snapshot, coverage) {
@@ -256,12 +274,17 @@ function renderElectionContent(snapshot, coverage) {
 
   let body;
   if (coverage === "BR") {
-    body = `<div class="election-live-grid">
+    body = `${renderElectionMap(stateMapFeatures, states, live.states, { coverage, overallResult: live.president })}
+    <div class="election-live-grid">
       ${renderCandidatePair(live.president?.candidates, { title: "Presidente · Brasil", eyebrow: "RESULTADO DO 2º TURNO", context: "Esta área mostra apenas os dados da segunda votação; nenhum resultado é estimado.", emptyMessage: "A apuração presidencial do segundo turno ainda não começou ou o arquivo oficial ainda não está disponível.", sourceUrl: live.president?.sourceUrl, publishedAt: live.president?.publishedDate && live.president?.publishedTime ? `${live.president.publishedDate} às ${live.president.publishedTime}` : null, period: "Segundo turno de 2026.", resultLabel: live.president ? (live.president.finalized ? "Totalização final" : "Em apuração") : "Aguardando votação" })}
       ${renderElectionTotalizers(live.president, { title: "Totalizadores nacionais", subtitle: "O total nacional da Presidência inclui a totalização das seções no exterior." })}
-      ${renderCandidatePair(referencePresident, { title: "Candidaturas presidenciais habilitadas", eyebrow: "PRESIDENTE · REFERÊNCIA DO 1º TURNO", context: "Nomes, votos e percentuais abaixo correspondem ao primeiro turno e servem apenas como referência para a disputa." , sourceUrl: referencePresidentUrl, publishedAt, period: "Primeiro turno de 2026; referência oficial.", resultLabel: "Referência do 1º turno" })}
     </div>
-    <section class="panel election-block"><div class="panel-head"><div><div class="section-kicker">GOVERNADORES</div><h2>Estados com segundo turno</h2></div><span class="quiet-badge">Derivado do 1º turno do TSE</span></div><p class="panel-intro">A relação é calculada por UF a partir da votação válida e só aparece quando o resultado oficial está totalizado.</p>${renderGovernorRunoffLinks(references.states)}${renderElectionMetadata({ definition: "Unidades em que nenhuma candidatura ao governo estadual obteve mais de 50% dos votos válidos no primeiro turno.", unit: "UFs com segundo turno para governador.", period: "Primeiro turno de 2026, totalização oficial.", sourceUrl: references.states?.find((state) => state.governor?.sourceUrl)?.governor?.sourceUrl, publishedAt: publishedAt, notes: "A lista não está codificada no site. Cada situação é derivada dos arquivos oficiais por UF; branco e nulo não integram os votos válidos." })}</section>
+    <section class="election-first-round-section"><div class="panel-head"><div><div class="section-kicker">DADOS OFICIAIS · REFERÊNCIA</div><h2>Primeiro turno · Presidência</h2></div><span class="quiet-badge">Votação em 04/10/2026</span></div>
+      <p class="panel-intro">Resultado oficial da primeira votação, separado da apuração do segundo turno. Os dois candidatos mais votados aparecem em destaque; a lista completa reúne as 12 candidaturas e os retratos oficiais do TSE.</p>
+      <div class="election-live-grid election-first-round-grid">${renderCandidatePair(referencePresident, { title: "Candidaturas mais votadas", eyebrow: "RESULTADO DO 1º TURNO", context: "Ordem decrescente de votos válidos, conforme a totalização do TSE.", sourceUrl: referencePresidentUrl, publishedAt, period: "Primeiro turno de 2026; totalização oficial.", frequency: "Arquivo final do primeiro turno; sem atualização periódica prevista.", resultLabel: "Finalizado pelo TSE" })}${renderElectionTotalizers(references.president?.error ? null : references.president, { title: "Totalizadores nacionais", subtitle: "Votação do primeiro turno para presidente; o total nacional inclui o Exterior.", period: "Primeiro turno de 2026", frequency: "Arquivo final do primeiro turno; sem atualização periódica prevista." })}</div>
+      ${renderCandidateResultsTable(referencePresident, { title: "Resultado completo das candidaturas presidenciais", sourceUrl: referencePresidentUrl, publishedAt, period: "Primeiro turno de 2026; Brasil, incluindo Exterior.", collapsed: true })}
+    </section>
+    ${renderGovernorFirstRoundResults(references.states)}
     ${renderElectionStatesTable(states, live.states)}
     ${liveConfigurationNote}`;
   } else {
@@ -495,6 +518,13 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) window.clearInterval(electionPollTimer);
   else refreshElectionSnapshot(selectedElectionCoverage);
 });
+
+document.addEventListener("error", (event) => {
+  const image = event.target;
+  if (!image.matches?.("[data-election-photo]")) return;
+  image.hidden = true;
+  image.nextElementSibling?.removeAttribute("hidden");
+}, true);
 
 document.addEventListener("keydown", (event) => {
   const region = event.target.closest?.(".state-region[role='button']");

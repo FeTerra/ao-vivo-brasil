@@ -564,6 +564,87 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
 .election-governor-unavailable { border-left: 3px solid #becbc8; }
 .election-governor-unavailable h2 { margin-bottom: 8px; }
 .election-governor-unavailable > p { color: #697c84; font-size: 11px; line-height: 1.6; }
+.election-map-panel { overflow: hidden; }
+.election-map-layout { display: grid; grid-template-columns: minmax(0,1fr) 210px; align-items: center; gap: 14px; margin-top: 8px; }
+.election-map-figure { min-width: 0; margin: 0; }
+.election-map-svg { display: block; width: min(100%, 650px); height: auto; margin: 0 auto; overflow: visible; }
+.election-map-link { outline: none; }
+.election-map-state-shape { fill: #e5edeb; stroke: #68817e; stroke-width: 1.45; stroke-linejoin: round; transition: fill .16s ease, stroke .16s ease; }
+.election-map-link.progress-0 .election-map-state-shape { fill: #d8e9e3; }
+.election-map-link.progress-20 .election-map-state-shape { fill: #badccf; }
+.election-map-link.progress-40 .election-map-state-shape { fill: #95c9b8; }
+.election-map-link.progress-60 .election-map-state-shape { fill: #6fb49f; }
+.election-map-link.progress-80 .election-map-state-shape { fill: #47947e; }
+.election-map-link:is(:hover,:focus-visible) .election-map-state-shape { stroke: #0d6558; stroke-width: 3.2; }
+.election-map-link.is-selected .election-map-state-shape { stroke: #144e46; stroke-width: 3.5; }
+.election-map-callout { fill: none; stroke: #839996; stroke-width: 1; }
+.election-map-label { fill: #294740; font-size: 16px; font-weight: 800; pointer-events: none; }
+.election-map-label.is-selected { fill: #075f51; text-decoration: underline; }
+.election-map-figure figcaption { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 7px; margin-top: -3px; color: #71838d; font-size: 9px; }
+.election-map-legend-key { width: 10px; height: 10px; border: 1px solid #68817e; border-radius: 3px; background: #e5edeb; }
+.election-map-scale { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 7px; }
+.election-map-scale > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.election-map-scale i { width: 8px; height: 8px; display: inline-block; border: 1px solid #68817e; border-radius: 2px; background: #d8e9e3; }
+.election-map-scale i.progress-20 { background: #badccf; }
+.election-map-scale i.progress-40 { background: #95c9b8; }
+.election-map-scale i.progress-60 { background: #6fb49f; }
+.election-map-scale i.progress-80 { background: #47947e; }
+.election-map-summary { display: grid; justify-items: start; gap: 8px; padding: 15px; border: 1px solid #dfe9e6; border-radius: 8px; background: #f7faf9; }
+.election-map-summary .section-kicker { margin: 0; }
+.election-map-summary > strong { color: #183e3a; font-size: 38px; line-height: 1; letter-spacing: -.05em; }
+.election-map-progress-label { color: #435e65; font-size: 10px; font-weight: 700; }
+.election-map-progress { width: 100%; height: 8px; overflow: hidden; border-radius: 20px; background: #e0e8e5; }
+.election-map-progress > span { height: 100%; display: block; border-radius: inherit; background: #398773; transition: width .25s ease; }
+.election-map-summary small { color: #71838d; font-size: 9px; line-height: 1.5; }
+.election-map-summary p { margin: 2px 0 0; color: #70818a; font-size: 9px; line-height: 1.55; }
+.election-map-panel .election-method { margin-top: 8px; }
+.election-candidate-heading { display: flex; align-items: center; gap: 10px; min-width: 0; margin-top: 9px; }
+.election-candidate-portrait { position: relative; flex: 0 0 54px; width: 54px; height: 54px; display: inline-grid; place-items: center; overflow: hidden; border: 1px solid #dce7e4; border-radius: 50%; color: #2e6559; background: linear-gradient(145deg,#d8e9e3,#f1f6f4); }
+.election-candidate-photo { width: 100%; height: 100%; display: block; border-radius: inherit; object-fit: cover; object-position: center 22%; }
+.election-candidate-photo-fallback { color: #315f55; font-size: 14px; font-weight: 800; }
+.election-candidate-heading > div { min-width: 0; }
+.election-candidate-heading h3 { margin: 0 0 3px; overflow-wrap: anywhere; }
+.election-candidate-heading p { margin: 0; }
+.election-candidate-portrait-small { flex-basis: 38px; width: 38px; height: 38px; }
+.election-candidate-portrait-small .election-candidate-photo-fallback { font-size: 10px; }
+.election-photo-cell { width: 48px; }
+.election-results-table { width: 100%; min-width: 600px; border-collapse: collapse; text-align: left; }
+.election-results-table th, .election-results-table td { padding: 8px 9px; border-bottom: 1px solid #edf0f1; color: #405761; font-size: 10px; vertical-align: middle; }
+.election-results-table thead th { color: #788991; font-size: 9px; }
+.election-results-table tbody th { min-width: 165px; font-weight: 500; }
+.election-results-table tbody th strong, .election-results-table tbody th small { display: block; }
+.election-results-table tbody th strong { color: #294350; font-size: 10px; }
+.election-results-table tbody th small { margin-top: 2px; color: #798990; font-size: 9px; }
+.election-candidate-rank { display: inline-block; min-width: 24px; color: #697d85; font-size: 9px; }
+.election-first-round-details > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: #203e4b; font-size: 13px; font-weight: 700; cursor: pointer; }
+.election-first-round-details > summary:focus-visible { outline: 3px solid #46cbbb; outline-offset: 4px; border-radius: 3px; }
+.election-first-round-details > summary span { color: #70828a; font-size: 10px; font-weight: 500; }
+.election-first-round-details[open] > summary { padding-bottom: 12px; border-bottom: 1px solid #edf0f1; }
+.election-first-round-details .election-results-table-panel { margin-top: 10px; }
+.election-first-round-section { margin-top: 18px; padding: 2px 0; }
+.election-first-round-section > .panel-head { margin: 0 0 8px; }
+.election-first-round-section > .panel-intro { margin: 0 0 12px; }
+.election-first-round-grid { margin-top: 0; }
+.election-first-round-section > .election-block { margin-top: 12px; }
+.election-governor-result-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; margin-top: 12px; }
+.election-governor-result { min-width: 0; padding: 11px; border: 1px solid #e2e9e8; border-radius: 7px; background: #fafcfc; }
+.election-governor-result-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.election-governor-result-head > div { min-width: 0; }
+.election-governor-result-head .section-kicker { margin: 0; font-size: 8px; }
+.election-governor-result-head h3 { margin: 4px 0 0; color: #25424d; font-size: 11px; }
+.election-governor-result-head h3 span { color: #6c8188; font-size: 10px; }
+.election-governor-source { display: block; margin-top: 4px; color: #7a8b92; font-size: 8px; line-height: 1.45; }
+.election-governor-source a { color: #177d70; text-decoration: underline; text-underline-offset: 2px; }
+.election-governor-result-head > a { flex: 0 0 auto; color: #177d70; font-size: 9px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.election-governor-result ol { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.election-governor-result > .election-first-round-details { margin-top: 10px; padding: 9px; box-shadow: none; }
+.election-governor-result > .election-first-round-details > summary { font-size: 9px; }
+.election-governor-result li { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.election-governor-candidate-name { min-width: 0; display: grid; gap: 2px; }
+.election-governor-candidate-name strong { overflow: hidden; color: #304b55; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.election-governor-candidate-name small, .election-governor-candidate-vote small { color: #798990; font-size: 8px; }
+.election-governor-candidate-vote { display: grid; justify-items: end; gap: 2px; margin-left: auto; text-align: right; white-space: nowrap; }
+.election-governor-candidate-vote strong { color: #304b55; font-size: 9px; }
 
 :root[data-theme="dark"] .election-controls,
 :root[data-theme="dark"] .election-skeleton,
@@ -586,6 +667,50 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
 :root[data-theme="dark"] .election-state-table td,
 :root[data-theme="dark"] .election-partial-hint,
 :root[data-theme="dark"] .election-governor-unavailable > p { color: #b4c4ca; }
+:root[data-theme="dark"] .election-map-state-shape { fill: #25353a; stroke: #748f8b; }
+:root[data-theme="dark"] .election-map-link.progress-0 .election-map-state-shape { fill: #31504a; }
+:root[data-theme="dark"] .election-map-link.progress-20 .election-map-state-shape { fill: #37665a; }
+:root[data-theme="dark"] .election-map-link.progress-40 .election-map-state-shape { fill: #3b7967; }
+:root[data-theme="dark"] .election-map-link.progress-60 .election-map-state-shape { fill: #468c76; }
+:root[data-theme="dark"] .election-map-link.progress-80 .election-map-state-shape { fill: #55a189; }
+:root[data-theme="dark"] .election-map-link:is(:hover,:focus-visible) .election-map-state-shape,
+:root[data-theme="dark"] .election-map-link.is-selected .election-map-state-shape { stroke: #a1e7d7; }
+:root[data-theme="dark"] .election-map-label { fill: #e0eeea; }
+:root[data-theme="dark"] .election-map-label.is-selected { fill: #a1e7d7; }
+:root[data-theme="dark"] .election-map-scale i { border-color: #748f8b; background: #31504a; }
+:root[data-theme="dark"] .election-map-scale i.progress-20 { background: #37665a; }
+:root[data-theme="dark"] .election-map-scale i.progress-40 { background: #3b7967; }
+:root[data-theme="dark"] .election-map-scale i.progress-60 { background: #468c76; }
+:root[data-theme="dark"] .election-map-scale i.progress-80 { background: #55a189; }
+:root[data-theme="dark"] .election-map-summary,
+:root[data-theme="dark"] .election-governor-result { border-color: var(--line); background: #18252c; }
+:root[data-theme="dark"] .election-governor-result > .election-first-round-details { background: #142127; }
+:root[data-theme="dark"] .election-map-summary > strong,
+:root[data-theme="dark"] .election-results-table tbody th strong,
+:root[data-theme="dark"] .election-first-round-details > summary,
+:root[data-theme="dark"] .election-governor-result-head h3,
+:root[data-theme="dark"] .election-governor-candidate-name strong,
+:root[data-theme="dark"] .election-governor-candidate-vote strong { color: #dce8eb; }
+:root[data-theme="dark"] .election-governor-source { color: #b4c4ca; }
+:root[data-theme="dark"] .election-governor-source a { color: #70d5c1; }
+:root[data-theme="dark"] .election-map-summary > strong { color: #9ee1d1; }
+:root[data-theme="dark"] .election-map-summary p,
+:root[data-theme="dark"] .election-map-summary small,
+:root[data-theme="dark"] .election-map-progress-label,
+:root[data-theme="dark"] .election-map-figure figcaption,
+:root[data-theme="dark"] .election-results-table th,
+:root[data-theme="dark"] .election-results-table td,
+:root[data-theme="dark"] .election-results-table tbody th small,
+:root[data-theme="dark"] .election-candidate-rank,
+:root[data-theme="dark"] .election-first-round-details > summary span,
+:root[data-theme="dark"] .election-governor-result-head h3 span,
+:root[data-theme="dark"] .election-governor-candidate-name small,
+:root[data-theme="dark"] .election-governor-candidate-vote small { color: #b4c4ca; }
+:root[data-theme="dark"] .election-candidate-portrait { border-color: #3b5552; color: #c5e9df; background: linear-gradient(145deg,#29443e,#213239); }
+:root[data-theme="dark"] .election-candidate-photo-fallback { color: #c5e9df; }
+:root[data-theme="dark"] .election-results-table tbody th strong { color: #dce8eb; }
+:root[data-theme="dark"] .election-first-round-details[open] > summary { border-color: var(--line); }
+:root[data-theme="dark"] .election-governor-result-head > a { color: #70d5c1; }
 :root[data-theme="dark"] .election-coverage-control { color: #b7c7cc; }
 :root[data-theme="dark"] .election-coverage-control select { border-color: #3a5059; color: #e0ebee; background: #19282f; }
 :root[data-theme="dark"] .election-candidate-card h3,
@@ -615,6 +740,13 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
   .election-metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .election-hero { padding-bottom: 20px; }
   .election-countdown { max-width: none; }
+  .election-map-layout { grid-template-columns: 1fr; }
+  .election-map-summary { grid-template-columns: 1fr auto; align-items: center; }
+  .election-map-summary .section-kicker, .election-map-summary .election-map-progress-label, .election-map-summary .election-map-progress, .election-map-summary small, .election-map-summary p { grid-column: 1 / -1; }
+  .election-map-summary > strong { grid-column: 1; grid-row: 2; }
+  .election-map-summary .election-map-progress-label { grid-row: 3; }
+  .election-map-summary { justify-items: start; }
+  .election-governor-result-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 @media (max-width: 420px) {
   .election-candidate-card { padding: 10px; }
@@ -626,5 +758,9 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
   .election-metadata-list { grid-template-columns: 1fr; }
   .election-metadata-wide { grid-column: auto; }
   .election-stale-alert { align-items: flex-start; flex-direction: column; }
+  .election-candidate-portrait { flex-basis: 44px; width: 44px; height: 44px; }
+  .election-candidate-heading { gap: 7px; }
+  .election-map-label { font-size: 15px; }
+  .election-governor-result-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .election-skeleton i { animation: none; } }

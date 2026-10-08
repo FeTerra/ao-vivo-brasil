@@ -53,6 +53,14 @@ export function formatElectionPercent(value) {
   return `${new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(number)}%`;
 }
 
+export function tseCandidatePhotoUrl(electionCode, coverage, sequence) {
+  const election = String(electionCode ?? "");
+  const scope = String(coverage ?? "").trim().toLowerCase();
+  const candidate = String(sequence ?? "");
+  if (!/^\d{4,6}$/.test(election) || !/^(br|zz|[a-z]{2})$/.test(scope) || !/^\d+$/.test(candidate)) return null;
+  return `https://resultados.tse.jus.br/oficial/ele2026/${election}/fotos/${scope}/${candidate}.jpeg`;
+}
+
 export function getTseCandidates(result, officeCode) {
   const office = result?.carg?.find((item) => String(item.cd) === String(officeCode));
   if (!office) return [];
@@ -68,6 +76,7 @@ export function getTseCandidates(result, officeCode) {
           party: party.sg || party.nm || "",
           votes: parseTseNumber(candidate.vap),
           percent: parseTseNumber(candidate.pvapn ?? candidate.pvap),
+          photoUrl: tseCandidatePhotoUrl(result.ele, result.cdabr || (String(officeCode) === "1" ? "br" : null), candidate.sqcand),
           status: candidate.st ?? "",
           voteDestination: candidate.dvt ?? "",
           officialOrder: parseTseNumber(candidate.seq),

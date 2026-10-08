@@ -9,8 +9,11 @@ import {
   normalizeTseResult,
   parseTseNumber,
   preserveLastElectionSnapshot,
+  tseCandidatePhotoUrl,
 } from "../src/elections.js";
-import { renderNoGovernorRunoffNotice } from "../src/election-components.js";
+import { renderCandidateResultsTable, renderElectionMap, renderFirstRoundResultsArchive, renderNoGovernorRunoffNotice } from "../src/election-components.js";
+import { states } from "../src/data.js";
+import { stateMapFeatures } from "../src/state-map.js";
 
 function firstRoundGovernorResult(votes) {
   const validVotes = votes.reduce((total, item) => total + item.votes, 0);
@@ -90,4 +93,58 @@ test("números do TSE são formatados em pt-BR sem perder casas decimais", () =>
   assert.equal(formatElectionPercent(null), "—");
   const incomplete = normalizeTseResult({ carg: [], s: {}, e: {}, v: {} }, "1");
   assert.equal(incomplete.votes.null, null);
+});
+
+test("fotos dos candidatos usam o identificador e o caminho oficial do TSE", () => {
+  assert.equal(
+    tseCandidatePhotoUrl("6257", "BR", "280002551544"),
+    "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
+  );
+  assert.equal(tseCandidatePhotoUrl("6257", "??", "280002551544"), null);
+  assert.equal(tseCandidatePhotoUrl("6257", "br", "../../foto"), null);
+});
+
+test("resultado completo mantém fotos, votação, situação e fonte identificadas", () => {
+  const table = renderCandidateResultsTable([
+    { name: "Candidatura A", party: "PA", votes: 1234, percent: 60.2, status: "2º turno", photoUrl: "https://resultados.tse.jus.br/fotos/a.jpeg" },
+    { name: "Candidatura B", party: "PB", votes: 800, percent: 39.8, status: "Não eleito" },
+  ], { sourceUrl: "https://resultados.tse.jus.br/oficial/app/index.html", collapsed: false });
+  assert.match(table, /Retrato oficial de Candidatura A/);
+  assert.match(table, /1\.234/);
+  assert.match(table, /60,2%/);
+  assert.match(table, /2º turno/);
+  assert.match(table, /TSE/);
+});
+
+test("arquivo de governador deixa os totalizadores e a lista completa do primeiro turno acessíveis", () => {
+  const archive = renderFirstRoundResultsArchive({
+    finalized: true,
+    sections: { percent: 100, counted: 200, total: 200 },
+    votes: { valid: 1000, blank: 10, null: 20 },
+    electors: { present: 1030, absent: 70 },
+    candidates: [{ name: "Candidatura estadual", party: "PE", votes: 1000, percent: 100, status: "Eleito" }],
+  }, { title: "Resultado do Acre", office: "Governo do Acre" });
+  assert.match(archive, /Resultado do Acre/);
+  assert.match(archive, /1.030/);
+  assert.match(archive, /Candidatura estadual/);
+  assert.match(archive, /Arquivo final do primeiro turno/);
+});
+
+test("mapa pré-apuração reúne as 27 UFs e identifica o zero como demonstrativo", () => {
+  const map = renderElectionMap(stateMapFeatures, states, [], { coverage: "BR" });
+  assert.equal((map.match(/class="election-map-link/g) || []).length, 27);
+  assert.match(map, /0% demonstrativo/);
+  assert.match(map, /não representa uma medição do TSE/);
+  assert.match(map, /aria-valuenow="0"/);
+  assert.match(map, /exterior/i);
+});
+
+test("mapa não inventa percentual nacional quando só existem arquivos estaduais", () => {
+  const map = renderElectionMap(stateMapFeatures, states, [{
+    uf: "AC",
+    president: { sections: { percent: 41.2, counted: 100, total: 243 } },
+  }], { coverage: "BR", overallResult: null });
+  assert.match(map, /Total nacional aguardando arquivo oficial/);
+  assert.match(map, /Acre \(AC\): 41,2% das seções apuradas/);
+  assert.doesNotMatch(map, /aria-valuenow="0"/);
 });
