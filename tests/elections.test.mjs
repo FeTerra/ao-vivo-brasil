@@ -15,6 +15,7 @@ import {
 import { renderCandidateResultsTable, renderElectionMap, renderFirstRoundResultsArchive, renderNoGovernorRunoffNotice } from "../src/election-components.js";
 import { states } from "../src/data.js";
 import { stateMapFeatures } from "../src/state-map.js";
+import electionApi from "../api/eleicoes/segundo-turno.js";
 
 function firstRoundGovernorResult(votes) {
   const validVotes = votes.reduce((total, item) => total + item.votes, 0);
@@ -49,6 +50,15 @@ test("o seletor converte abrangência para uma URL compartilhável e volta para 
   assert.equal(electionHashForCoverage("BR"), "#eleicoes/segundo-turno");
   assert.equal(electionCoverageFromHash("#eleicoes/segundo-turno"), "BR");
   assert.equal(electionCoverageFromHash("#eleicoes/segundo-turno/XX"), null);
+});
+
+test("a função da Vercel valida a abrangência e rejeita métodos não suportados", async () => {
+  const invalidCoverage = await electionApi.fetch(new Request("https://site.test/api/eleicoes/segundo-turno?abrangencia=XX"));
+  assert.equal(invalidCoverage.status, 400);
+  assert.match((await invalidCoverage.json()).message, /Abrangência inválida/);
+
+  const unsupportedMethod = await electionApi.fetch(new Request("https://site.test/api/eleicoes/segundo-turno", { method: "POST" }));
+  assert.equal(unsupportedMethod.status, 405);
 });
 
 test("a maioria absoluta no primeiro turno dispensa segundo turno de governador", () => {

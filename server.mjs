@@ -274,7 +274,7 @@ async function buildSnapshot(coverage, force = false) {
   };
 }
 
-async function getSnapshot(coverage, force) {
+export async function getElectionSnapshot(coverage, force = false) {
   const cached = snapshotCache.get(coverage);
   if (!force && cached && Date.now() - cached.cachedAt < snapshotCacheMs) return cached.snapshot;
   if (snapshotRequests.has(coverage)) return snapshotRequests.get(coverage);
@@ -314,7 +314,7 @@ async function serveElectionApi(request, response, requestUrl) {
   }
 
   try {
-    const snapshot = await getSnapshot(coverage, requestUrl.searchParams.get("atualizar") === "1");
+    const snapshot = await getElectionSnapshot(coverage, requestUrl.searchParams.get("atualizar") === "1");
     jsonResponse(response, 200, snapshot);
   } catch (error) {
     jsonResponse(response, 502, {
@@ -376,8 +376,11 @@ const server = createServer(async (request, response) => {
   await serveStatic(request, response, requestUrl.pathname);
 });
 
-server.listen(port, () => {
-  process.stdout.write(`Ao Vivo Brasil disponível em http://localhost:${port}\n`);
-});
+const entryFile = process.argv[1] ? resolve(process.argv[1]) : null;
+if (entryFile === fileURLToPath(import.meta.url)) {
+  server.listen(port, () => {
+    process.stdout.write(`Ao Vivo Brasil disponível em http://localhost:${port}\n`);
+  });
+}
 
 export { server };
