@@ -180,6 +180,36 @@ function route() {
   }
 }
 
+function setupThemeToggle() {
+  const toggle = byId("theme-toggle");
+  const icon = toggle.querySelector(".theme-toggle-icon");
+  const label = toggle.querySelector(".theme-toggle-label");
+  const status = byId("theme-status");
+
+  function applyTheme(theme, announce = false) {
+    const isDark = theme === "dark";
+    document.documentElement.dataset.theme = isDark ? "dark" : "light";
+    toggle.setAttribute("aria-pressed", String(isDark));
+    toggle.setAttribute("aria-label", isDark ? "Ativar tema claro" : "Ativar modo noturno");
+    icon.textContent = isDark ? "☀" : "☾";
+    label.textContent = isDark ? "Tema claro" : "Tema escuro";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", isDark ? "#10191f" : "#102b3f");
+    if (announce) {
+      try {
+        localStorage.setItem("ao-vivo-brasil-theme", isDark ? "dark" : "light");
+      } catch {
+        // A página também pode ser aberta como arquivo local, onde o armazenamento pode estar bloqueado.
+      }
+    }
+    if (announce) status.textContent = isDark ? "Modo noturno ativado." : "Tema claro ativado.";
+  }
+
+  applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+  toggle.addEventListener("click", () => {
+    applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
+  });
+}
+
 document.addEventListener("click", (event) => {
   const target = event.target.closest("[data-indicator], [data-proposal], [data-open-module], [data-open-first-indicator], [data-uf]");
   if (!target) return;
@@ -200,6 +230,7 @@ byId("detail-dialog").addEventListener("click", (event) => {
 });
 window.addEventListener("hashchange", route);
 
+setupThemeToggle();
 renderNavigation();
 renderIndicators();
 renderUpdates();
