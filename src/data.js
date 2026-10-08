@@ -44,12 +44,12 @@ export const proposals = [
   { id: "demo-camara", house: "Câmara", subject: "Exemplo fictício de projeto sobre acesso à informação", stage: "Etapa demonstrativa · aguardando votação", movedAt: null, code: "PL 0000/20XX", party: "Conteúdo criado apenas para demonstrar a interface", timeline: ["Apresentação · exemplo", "Comissão · exemplo", "Votação · pendente", "Sanção · pendente"] },
 ];
 
-// Posições aproximadas para um cartograma esquemático, sem codificação de valores.
+// Unidades da Federação e nomes usados nas fichas e nos rótulos do mapa.
 export const states = [
-  { uf: "RR", name: "Roraima", col: 4, row: 1 }, { uf: "AP", name: "Amapá", col: 6, row: 1 },
-  { uf: "AM", name: "Amazonas", col: 2, row: 2 }, { uf: "PA", name: "Pará", col: 5, row: 2 }, { uf: "MA", name: "Maranhão", col: 7, row: 2 },
-  { uf: "AC", name: "Acre", col: 1, row: 3 }, { uf: "RO", name: "Rondônia", col: 2, row: 3 }, { uf: "MT", name: "Mato Grosso", col: 3, row: 3 }, { uf: "TO", name: "Tocantins", col: 5, row: 3 }, { uf: "PI", name: "Piauí", col: 6, row: 3 }, { uf: "CE", name: "Ceará", col: 7, row: 3 }, { uf: "RN", name: "Rio Grande do Norte", col: 8, row: 3 },
-  { uf: "PB", name: "Paraíba", col: 8, row: 4 }, { uf: "PE", name: "Pernambuco", col: 7, row: 4 }, { uf: "BA", name: "Bahia", col: 6, row: 5 }, { uf: "AL", name: "Alagoas", col: 8, row: 5 }, { uf: "SE", name: "Sergipe", col: 7, row: 5 },
-  { uf: "DF", name: "Distrito Federal", col: 5, row: 4 }, { uf: "GO", name: "Goiás", col: 4, row: 4 }, { uf: "MS", name: "Mato Grosso do Sul", col: 3, row: 5 }, { uf: "MG", name: "Minas Gerais", col: 5, row: 5 }, { uf: "ES", name: "Espírito Santo", col: 6, row: 6 },
-  { uf: "SP", name: "São Paulo", col: 4, row: 6 }, { uf: "RJ", name: "Rio de Janeiro", col: 5, row: 6 }, { uf: "PR", name: "Paraná", col: 4, row: 7 }, { uf: "SC", name: "Santa Catarina", col: 5, row: 7 }, { uf: "RS", name: "Rio Grande do Sul", col: 4, row: 8 },
+  { uf: "RR", name: "Roraima" }, { uf: "AP", name: "Amapá" },
+  { uf: "AM", name: "Amazonas" }, { uf: "PA", name: "Pará" }, { uf: "MA", name: "Maranhão" },
+  { uf: "AC", name: "Acre" }, { uf: "RO", name: "Rondônia" }, { uf: "MT", name: "Mato Grosso" }, { uf: "TO", name: "Tocantins" }, { uf: "PI", name: "Piauí" }, { uf: "CE", name: "Ceará" }, { uf: "RN", name: "Rio Grande do Norte" },
+  { uf: "PB", name: "Paraíba" }, { uf: "PE", name: "Pernambuco" }, { uf: "BA", name: "Bahia" }, { uf: "AL", name: "Alagoas" }, { uf: "SE", name: "Sergipe" },
+  { uf: "DF", name: "Distrito Federal" }, { uf: "GO", name: "Goiás" }, { uf: "MS", name: "Mato Grosso do Sul" }, { uf: "MG", name: "Minas Gerais" }, { uf: "ES", name: "Espírito Santo" },
+  { uf: "SP", name: "São Paulo" }, { uf: "RJ", name: "Rio de Janeiro" }, { uf: "PR", name: "Paraná" }, { uf: "SC", name: "Santa Catarina" }, { uf: "RS", name: "Rio Grande do Sul" },
 ];

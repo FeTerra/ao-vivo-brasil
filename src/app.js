@@ -1,4 +1,5 @@
 import { modules, indicators, updates, proposals, states } from "./data.js";
+import { stateMapFeatures } from "./state-map.js";
 
 const byId = (id) => document.getElementById(id);
 const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
@@ -92,11 +93,23 @@ function renderDashboard() {
 
 function renderStateMap() {
   const selected = states.find((state) => state.uf === selectedUf);
+  const stateByUf = new Map(states.map((state) => [state.uf, state]));
   return `<div class="state-explorer">
-    <div class="state-map-card panel"><div class="panel-head"><div><div class="section-kicker">CARTOGRAMA ESQUEMÁTICO</div><h2>Selecione uma UF</h2></div><span class="quiet-badge">Sem escala de dados</span></div>
-      <p class="panel-intro">Posições aproximadas apenas para demonstrar a seleção. Nenhum estado está classificado por resultado.</p>
-      <div class="state-map" role="group" aria-label="Selecione uma unidade da Federação">${states.map((state) => `<button class="uf-tile ${selectedUf === state.uf ? "is-selected" : ""}" style="--col:${state.col};--row:${state.row}" data-uf="${state.uf}" aria-pressed="${selectedUf === state.uf}" aria-label="${escapeHtml(state.name)}, ${state.uf}">${state.uf}</button>`).join("")}</div>
-      <div class="map-caption"><span class="map-key" aria-hidden="true"></span> Cartograma ilustrativo · 26 estados e Distrito Federal</div>
+    <div class="state-map-card panel"><div class="panel-head"><div><div class="section-kicker">UNIDADES DA FEDERAÇÃO</div><h2>Selecione um estado</h2></div><span class="quiet-badge">Sem dados temáticos</span></div>
+      <p class="panel-intro">Limites estaduais baseados na malha geográfica do IBGE. A seleção demonstra o recorte territorial e não representa resultados.</p>
+      <div class="state-map">
+        <svg class="state-map-svg" viewBox="0 0 760 680" role="group" aria-labelledby="state-map-title state-map-description">
+          <title id="state-map-title">Mapa do Brasil por unidade da Federação</title>
+          <desc id="state-map-description">Mapa esquemático com os limites das 27 unidades da Federação. Selecione uma área para consultar a disponibilidade de dados.</desc>
+          <g class="state-map-regions">${stateMapFeatures.map((feature) => {
+            const state = stateByUf.get(feature.uf);
+            return `<g class="state-region ${selectedUf === feature.uf ? "is-selected" : ""}" data-uf="${feature.uf}" role="button" tabindex="0" aria-pressed="${selectedUf === feature.uf}" aria-label="${escapeHtml(state.name)}, ${feature.uf}"><path class="state-shape" d="${feature.path}" fill-rule="evenodd"></path></g>`;
+          }).join("")}</g>
+          <g class="state-map-callouts" aria-hidden="true">${stateMapFeatures.filter((feature) => feature.callout).map((feature) => `<path class="state-callout-line" d="${feature.callout}"></path>`).join("")}</g>
+          <g class="state-map-labels" aria-hidden="true">${stateMapFeatures.map((feature) => `<text class="state-label ${selectedUf === feature.uf ? "is-selected" : ""}" x="${feature.labelX}" y="${feature.labelY}" text-anchor="middle">${feature.uf}</text>`).join("")}</g>
+        </svg>
+      </div>
+      <div class="map-caption"><span class="map-key" aria-hidden="true"></span><span>27 UFs · seleção demonstrativa, sem valores</span><a href="https://www.ibge.gov.br/geociencias/organizacao-do-territorio/malhas-territoriais/15774-malhas.html" target="_blank" rel="noopener noreferrer">Malha territorial do IBGE <span aria-hidden="true">↗</span></a></div>
     </div>
     <aside class="state-detail panel" aria-live="polite"><div class="section-kicker">RECORTE ESTADUAL</div><div class="state-detail-code">${selected ? escapeHtml(selected.uf) : "BR"}</div><h2>${selected ? escapeHtml(selected.name) : "Brasil"}</h2><p>${selected ? "A consulta estadual será exibida quando uma série oficial comparável estiver integrada." : "Selecione uma unidade da Federação para ver a disponibilidade do recorte."}</p><div class="state-empty"><span class="empty-dot" aria-hidden="true"></span><span>Sem indicadores estaduais integrados</span></div><div class="state-note">Comparações só serão exibidas com definições e períodos compatíveis.</div></aside>
   </div>`;
@@ -223,6 +236,13 @@ document.addEventListener("click", (event) => {
     const firstTile = document.querySelector(`[data-uf="${selectedUf}"]`);
     firstTile?.focus({ preventScroll: true });
   }
+});
+
+document.addEventListener("keydown", (event) => {
+  const region = event.target.closest?.(".state-region[role='button']");
+  if (!region || !["Enter", " "].includes(event.key)) return;
+  event.preventDefault();
+  region.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
 });
 
 byId("detail-dialog").addEventListener("click", (event) => {

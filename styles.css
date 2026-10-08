@@ -222,11 +222,20 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
 .state-explorer { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(220px, .7fr); gap: 14px; margin-top: 26px; }
 .state-map-card { padding: 20px 22px; }
 .state-map-card .panel-intro { max-width: 460px; }
-.state-map { position: relative; width: min(100%, 560px); aspect-ratio: 1.45; margin: 11px auto 3px; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); gap: clamp(3px, .7vw, 8px); }
-.uf-tile { grid-column: var(--col); grid-row: var(--row); align-self: center; justify-self: center; width: min(100%, 45px); aspect-ratio: 1.15; padding: 0; border: 1px solid #d7e8e3; border-radius: 5px; color: #587970; background: #edf6f3; cursor: pointer; font-size: clamp(9px, .8vw, 10px); font-weight: 700; transition: .15s ease; }
-.uf-tile:hover, .uf-tile.is-selected { border-color: #178b7b; color: white; background: #178b7b; box-shadow: 0 3px 9px rgba(18,131,114,.19); }
-.map-caption { display: flex; justify-content: center; align-items: center; gap: 7px; margin-top: 14px; color: #9aa6ac; font-size: 9px; }
-.map-key { width: 8px; height: 8px; border-radius: 2px; background: #d9eee7; }
+.state-map { width: min(100%, 700px); margin: 10px auto 0; }
+.state-map-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.state-region { cursor: pointer; outline: none; }
+.state-shape { fill: #eaf5f1; stroke: #b8d3ca; stroke-width: 1.35; stroke-linejoin: round; stroke-linecap: round; vector-effect: non-scaling-stroke; transition: fill .15s ease, stroke .15s ease, stroke-width .15s ease; }
+.state-region:hover .state-shape { fill: #d8eee7; stroke: #5b9d8c; }
+.state-region:focus-visible .state-shape { fill: #d8eee7; stroke: #087d6e; stroke-width: 2.6; }
+.state-region.is-selected .state-shape { fill: #178b7b; stroke: #087769; stroke-width: 2; }
+.state-map-callouts { fill: none; stroke: #819c93; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
+.state-label { fill: #45665e; font-family: 'DM Sans', 'Segoe UI', sans-serif; font-size: 15px; font-weight: 800; dominant-baseline: middle; pointer-events: none; }
+.state-label.is-selected { fill: #fff; }
+.map-caption { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 7px 10px; margin-top: 5px; color: #9aa6ac; font-size: 9px; }
+.map-key { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 2px; background: #9acdbd; }
+.map-caption a { color: #138475; font-weight: 700; text-underline-offset: 3px; }
+.map-caption a:hover { text-decoration: underline; }
 .state-detail { min-height: 300px; padding: 22px; }
 .state-detail-code { margin-top: 21px; color: #b7d9d0; font-family: Manrope, sans-serif; font-size: 44px; font-weight: 800; letter-spacing: -.08em; }
 .state-detail h2 { margin-top: -3px; }
@@ -440,10 +449,15 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
 :root[data-theme="dark"] .module-method p { color: #b9c8cd; }
 :root[data-theme="dark"] .module-meta { border-color: #344843; }
 :root[data-theme="dark"] .empty-catalog { border-color: var(--line); }
-:root[data-theme="dark"] .uf-tile { border-color: #3b5b53; color: #c3ddd6; background: #203835; }
-:root[data-theme="dark"] .uf-tile:hover,
-:root[data-theme="dark"] .uf-tile.is-selected { border-color: #48b9a4; color: #fff; background: #178b7b; }
-:root[data-theme="dark"] .map-key { background: #345e55; }
+:root[data-theme="dark"] .state-shape { fill: #203835; stroke: #46665d; }
+:root[data-theme="dark"] .state-region:hover .state-shape,
+:root[data-theme="dark"] .state-region:focus-visible .state-shape { fill: #2a4a43; stroke: #78cbb7; }
+:root[data-theme="dark"] .state-region.is-selected .state-shape { fill: #178b7b; stroke: #57c9b4; }
+:root[data-theme="dark"] .state-map-callouts { stroke: #78968b; }
+:root[data-theme="dark"] .state-label { fill: #c1ddd5; }
+:root[data-theme="dark"] .state-label.is-selected { fill: #fff; }
+:root[data-theme="dark"] .map-key { background: #4e8f7c; }
+:root[data-theme="dark"] .map-caption a { color: #70d5c1; }
 :root[data-theme="dark"] .state-detail-code { color: #37675d; }
 :root[data-theme="dark"] .state-detail { border-color: var(--line); }
 :root[data-theme="dark"] .detail-dialog { color: var(--ink); box-shadow: 0 25px 80px rgba(0, 0, 0, .55); }
@@ -469,3 +483,4 @@ h2 { margin: 0; color: var(--ink); font-family: Manrope, 'Segoe UI', sans-serif;
   .theme-toggle-icon { font-size: 17px; }
 }
 @media (max-width: 480px) { .integrity-pill { display: none; } }
+@media (max-width: 720px) { .state-map { max-width: 620px; } .state-label { font-size: 24px; } }
