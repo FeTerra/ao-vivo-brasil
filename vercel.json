@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/eleicoes/segundo-turno.js": {
+    "api/eleicoes/segundo-turno.mjs": {
       "maxDuration": 30
     }
   }

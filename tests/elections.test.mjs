@@ -15,7 +15,7 @@ import {
 import { renderCandidateResultsTable, renderElectionMap, renderFirstRoundResultsArchive, renderNoGovernorRunoffNotice } from "../src/election-components.js";
 import { states } from "../src/data.js";
 import { stateMapFeatures } from "../src/state-map.js";
-import electionApi from "../api/eleicoes/segundo-turno.js";
+import electionApi from "../api/eleicoes/segundo-turno.mjs";
 
 function firstRoundGovernorResult(votes) {
   const validVotes = votes.reduce((total, item) => total + item.votes, 0);

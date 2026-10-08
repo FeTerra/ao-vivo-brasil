@@ -16,7 +16,7 @@ Abra [http://localhost:8000](http://localhost:8000). Encerre o servidor com `Ctr
 
 - A página está em `#eleicoes/segundo-turno`; as abrangências Brasil, UFs e Exterior são refletidas na URL.
 - `server.mjs` consulta os arquivos JSON públicos documentados pelo TSE, valida o turno e mantém cache e última resposta válida em memória.
-- Em deploys na Vercel, `api/eleicoes/segundo-turno.js` expõe o mesmo adaptador como função Node para que o painel carregue os resultados oficiais. `vercel.json` define a duração máxima da função.
+- Em deploys na Vercel, `api/eleicoes/segundo-turno.mjs` expõe o mesmo adaptador como função Node para que o painel carregue os resultados oficiais. A extensão `.mjs` deixa explícito o uso de módulos ES sem exigir `package.json`.
 - Os códigos `6257` (federal) e `6259` (estadual) são usados apenas para a referência oficial do primeiro turno. A relação de estados com disputa para governador é derivada dos arquivos do TSE; não está fixa no código.
 - A página mostra o resultado presidencial completo do primeiro turno e, para cada disputa estadual habilitada, os dois candidatos mais votados nessa rodada. No detalhe de cada UF, ficam disponíveis os totalizadores e a lista completa de candidaturas da eleição para governador. Os retratos presidenciais usam o arquivo nacional do TSE em todos os recortes; fotos de governador usam o arquivo estadual. Se uma foto não estiver disponível, aparecem as iniciais.
 - O mapa presidencial por UF é um componente de acompanhamento. Antes dos arquivos do segundo turno, o 0% é apenas demonstrativo da interface e fica identificado como não oficial; os votos e totalizadores da segunda rodada permanecem vazios.
@@ -50,6 +50,6 @@ node --test tests/elections.test.mjs
 - `src/election-components.js`: fichas, totalizadores, pares de candidaturas e tabela de UFs.
 - `src/services/tse-results.js`: adaptador cliente para a API local.
 - `server.mjs`: servidor local e proxy/cache para os arquivos públicos do TSE.
-- `api/eleicoes/segundo-turno.js`: função Node da Vercel para a rota oficial de consulta usada pelo painel.
+- `api/eleicoes/segundo-turno.mjs`: função Node da Vercel para a rota oficial de consulta usada pelo painel.
 - `vercel.json`: limites de execução das funções serverless.
 - `tests/elections.test.mjs`: testes nativos de Node.js para a página eleitoral.
