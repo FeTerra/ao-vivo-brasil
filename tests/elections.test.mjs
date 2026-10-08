@@ -6,6 +6,7 @@ import {
   electionHashForCoverage,
   formatElectionInteger,
   formatElectionPercent,
+  getTseCandidates,
   normalizeTseResult,
   parseTseNumber,
   preserveLastElectionSnapshot,
@@ -102,6 +103,33 @@ test("fotos dos candidatos usam o identificador e o caminho oficial do TSE", () 
   );
   assert.equal(tseCandidatePhotoUrl("6257", "??", "280002551544"), null);
   assert.equal(tseCandidatePhotoUrl("6257", "br", "../../foto"), null);
+});
+
+test("retratos presidenciais usam a pasta nacional em toda UF e também no recorte Exterior", () => {
+  const candidate = { sqcand: "280002551544", nmu: "CANDIDATO TESTE", vap: "1" };
+  const resultFor = (coverage, election = "6257") => ({
+    ele: election,
+    cdabr: coverage,
+    carg: [{ cd: "1", agr: [{ par: [{ sg: "PT", cand: [candidate] }] }] }],
+  });
+
+  for (const { uf } of states) {
+    assert.equal(
+      getTseCandidates(resultFor(uf.toLowerCase()), "1")[0].photoUrl,
+      "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
+      `O retrato presidencial em ${uf} deve usar o arquivo nacional do TSE`,
+    );
+  }
+  assert.equal(
+    getTseCandidates(resultFor("zz"), "1")[0].photoUrl,
+    "https://resultados.tse.jus.br/oficial/ele2026/6257/fotos/br/280002551544.jpeg",
+  );
+  const governorResult = resultFor("rs", "6259");
+  governorResult.carg[0].cd = "3";
+  assert.equal(
+    getTseCandidates(governorResult, "3")[0].photoUrl,
+    "https://resultados.tse.jus.br/oficial/ele2026/6259/fotos/rs/280002551544.jpeg",
+  );
 });
 
 test("resultado completo mantém fotos, votação, situação e fonte identificadas", () => {

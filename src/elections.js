@@ -64,6 +64,7 @@ export function tseCandidatePhotoUrl(electionCode, coverage, sequence) {
 export function getTseCandidates(result, officeCode) {
   const office = result?.carg?.find((item) => String(item.cd) === String(officeCode));
   if (!office) return [];
+  const photoCoverage = String(officeCode) === "1" ? "br" : result.cdabr;
   const candidates = [];
 
   for (const group of office.agr ?? []) {
@@ -76,7 +77,7 @@ export function getTseCandidates(result, officeCode) {
           party: party.sg || party.nm || "",
           votes: parseTseNumber(candidate.vap),
           percent: parseTseNumber(candidate.pvapn ?? candidate.pvap),
-          photoUrl: tseCandidatePhotoUrl(result.ele, result.cdabr || (String(officeCode) === "1" ? "br" : null), candidate.sqcand),
+          photoUrl: tseCandidatePhotoUrl(result.ele, photoCoverage || (String(officeCode) === "1" ? "br" : null), candidate.sqcand),
           status: candidate.st ?? "",
           voteDestination: candidate.dvt ?? "",
           officialOrder: parseTseNumber(candidate.seq),

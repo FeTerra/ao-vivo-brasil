@@ -151,7 +151,7 @@ async function loadFirstRoundGovernor(uf, force) {
 async function loadFirstRoundReferences(coverage, force) {
   const selectedStates = coverage === "BR" ? states : coverage === "EX" ? [] : states.filter((state) => state.uf === coverage);
   const [presidentResult, governorResults] = await Promise.all([
-    loadFirstRoundPresident(coverage === "BR" || coverage === "EX" ? "br" : coverage, force)
+    loadFirstRoundPresident(coverage === "BR" ? "br" : coverage === "EX" ? "zz" : coverage, force)
       .catch((error) => ({ error: error.message })),
     mapLimit(selectedStates, 6, async (state) => {
       try {
