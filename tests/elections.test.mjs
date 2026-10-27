@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import {
   deriveGovernorRunoff,
   electionCoverageFromHash,
@@ -12,10 +14,12 @@ import {
   preserveLastElectionSnapshot,
   tseCandidatePhotoUrl,
 } from "../src/elections.js";
-import { renderCandidateResultsTable, renderElectionMap, renderFirstRoundResultsArchive, renderNoGovernorRunoffNotice } from "../src/election-components.js";
+import { CandidateResultsTable, ElectionMap, FirstRoundResultsArchive, NoGovernorRunoffNotice } from "../src/election-components.js";
 import { states } from "../src/data.js";
 import { stateMapFeatures } from "../src/state-map.js";
-import electionApi from "../api/eleicoes/segundo-turno.mjs";
+import electionApi from "../src/services/election-api.mjs";
+
+const render = (Component, props) => renderToStaticMarkup(createElement(Component, props));
 
 function firstRoundGovernorResult(votes) {
   const validVotes = votes.reduce((total, item) => total + item.votes, 0);
@@ -52,7 +56,7 @@ test("o seletor converte abrangência para uma URL compartilhável e volta para 
   assert.equal(electionCoverageFromHash("#eleicoes/segundo-turno/XX"), null);
 });
 
-test("a função da Vercel valida a abrangência e rejeita métodos não suportados", async () => {
+test("a rota do TSE valida a abrangência e rejeita métodos não suportados", async () => {
   const invalidCoverage = await electionApi.fetch(new Request("https://site.test/api/eleicoes/segundo-turno?abrangencia=XX"));
   assert.equal(invalidCoverage.status, 400);
   assert.match((await invalidCoverage.json()).message, /Abrangência inválida/);
@@ -70,7 +74,7 @@ test("a maioria absoluta no primeiro turno dispensa segundo turno de governador"
   assert.equal(result.status, "official");
   assert.equal(result.hasRunoff, false);
   assert.deepEqual(result.candidates, []);
-  const notice = renderNoGovernorRunoffNotice({ uf: "AL", stateName: "Alagoas" });
+  const notice = render(NoGovernorRunoffNotice, { uf: "AL", stateName: "Alagoas" });
   assert.match(notice, /Este estado não tem segundo turno para governador/);
   assert.match(notice, /Alagoas/);
 });
@@ -143,10 +147,10 @@ test("retratos presidenciais usam a pasta nacional em toda UF e também no recor
 });
 
 test("resultado completo mantém fotos, votação, situação e fonte identificadas", () => {
-  const table = renderCandidateResultsTable([
+  const table = render(CandidateResultsTable, { candidates: [
     { name: "Candidatura A", party: "PA", votes: 1234, percent: 60.2, status: "2º turno", photoUrl: "https://resultados.tse.jus.br/fotos/a.jpeg" },
     { name: "Candidatura B", party: "PB", votes: 800, percent: 39.8, status: "Não eleito" },
-  ], { sourceUrl: "https://resultados.tse.jus.br/oficial/app/index.html", collapsed: false });
+  ], sourceUrl: "https://resultados.tse.jus.br/oficial/app/index.html", collapsed: false });
   assert.match(table, /Retrato oficial de Candidatura A/);
   assert.match(table, /1\.234/);
   assert.match(table, /60,2%/);
@@ -155,13 +159,13 @@ test("resultado completo mantém fotos, votação, situação e fonte identifica
 });
 
 test("arquivo de governador deixa os totalizadores e a lista completa do primeiro turno acessíveis", () => {
-  const archive = renderFirstRoundResultsArchive({
+  const archive = render(FirstRoundResultsArchive, { result: {
     finalized: true,
     sections: { percent: 100, counted: 200, total: 200 },
     votes: { valid: 1000, blank: 10, null: 20 },
     electors: { present: 1030, absent: 70 },
     candidates: [{ name: "Candidatura estadual", party: "PE", votes: 1000, percent: 100, status: "Eleito" }],
-  }, { title: "Resultado do Acre", office: "Governo do Acre" });
+  }, title: "Resultado do Acre", office: "Governo do Acre" });
   assert.match(archive, /Resultado do Acre/);
   assert.match(archive, /1.030/);
   assert.match(archive, /Candidatura estadual/);
@@ -169,7 +173,7 @@ test("arquivo de governador deixa os totalizadores e a lista completa do primeir
 });
 
 test("mapa pré-apuração reúne as 27 UFs e identifica o zero como demonstrativo", () => {
-  const map = renderElectionMap(stateMapFeatures, states, [], { coverage: "BR" });
+  const map = render(ElectionMap, { features: stateMapFeatures, states, liveStates: [], coverage: "BR" });
   assert.equal((map.match(/class="election-map-link/g) || []).length, 27);
   assert.match(map, /0% demonstrativo/);
   assert.match(map, /não representa uma medição do TSE/);
@@ -178,10 +182,10 @@ test("mapa pré-apuração reúne as 27 UFs e identifica o zero como demonstrati
 });
 
 test("mapa não inventa percentual nacional quando só existem arquivos estaduais", () => {
-  const map = renderElectionMap(stateMapFeatures, states, [{
+  const map = render(ElectionMap, { features: stateMapFeatures, states, liveStates: [{
     uf: "AC",
     president: { sections: { percent: 41.2, counted: 100, total: 243 } },
-  }], { coverage: "BR", overallResult: null });
+  }], coverage: "BR", overallResult: null });
   assert.match(map, /Total nacional aguardando arquivo oficial/);
   assert.match(map, /Acre \(AC\): 41,2% das seções apuradas/);
   assert.doesNotMatch(map, /aria-valuenow="0"/);

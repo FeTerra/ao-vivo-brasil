@@ -1,5 +1,6 @@
 const endpoint = "/api/eleicoes/segundo-turno";
 
+/** @param {string} coverage @param {{ signal?: AbortSignal, refresh?: boolean }} [options] */
 export async function loadElectionSnapshot(coverage, { signal, refresh = false } = {}) {
   const query = new URLSearchParams({ abrangencia: coverage });
   if (refresh) query.set("atualizar", "1");

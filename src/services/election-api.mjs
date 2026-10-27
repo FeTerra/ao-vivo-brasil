@@ -1,12 +1,12 @@
 import { getElectionSnapshot } from "../../server.mjs";
-import { normalizeElectionCoverage } from "../../src/elections.js";
+import { normalizeElectionCoverage } from "../elections.js";
 
 const responseHeaders = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
 };
 
-export default {
+const electionApi = {
   async fetch(request) {
     if (request.method !== "GET") {
       return new Response(null, {
@@ -31,9 +31,11 @@ export default {
       return Response.json({
         status: "error",
         message: "Não foi possível consultar os arquivos oficiais do TSE. Tente novamente.",
-        detail: error.message,
+        detail: error instanceof Error ? error.message : "Erro inesperado ao consultar o TSE.",
         checkedAt: new Date().toISOString(),
       }, { status: 502, headers: responseHeaders });
     }
   },
 };
+
+export default electionApi;

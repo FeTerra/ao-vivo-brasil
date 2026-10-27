@@ -33,12 +33,6 @@ export const indicators = [
   { id: "carga-tributaria", name: "Carga tributária", shortName: "Carga tributária", value: null, unit: "% do PIB", module: "impostos", definition: "Relação entre a arrecadação de tributos e o Produto Interno Bruto segundo metodologia explicitada.", period: "Sem período integrado", source: "Tesouro Nacional · fonte prevista", publishedAt: null, frequency: "Anual", methodology: "A composição dos tributos e a versão do PIB adotadas serão informadas para permitir comparação entre séries.", status: "Integração pendente" },
 ];
 
-export const updates = [
-  { label: "Catálogo de módulos", detail: "Oito temas organizados para consulta pública.", type: "Produto" },
-  { label: "Fichas metodológicas", detail: "Campos preparados para definição, período, fonte e notas.", type: "Transparência" },
-  { label: "Integrações oficiais", detail: "Nenhuma série foi sincronizada nesta versão.", type: "Dados" },
-];
-
 export const proposals = [
   { id: "demo-senado", house: "Senado", subject: "Exemplo fictício de proposta sobre mobilidade urbana", stage: "Etapa demonstrativa · comissão", movedAt: null, code: "PL 0000/20XX", party: "Conteúdo criado apenas para demonstrar a interface", timeline: ["Apresentação · exemplo", "Comissão · exemplo", "Parecer · pendente", "Plenário · pendente"] },
   { id: "demo-camara", house: "Câmara", subject: "Exemplo fictício de projeto sobre acesso à informação", stage: "Etapa demonstrativa · aguardando votação", movedAt: null, code: "PL 0000/20XX", party: "Conteúdo criado apenas para demonstrar a interface", timeline: ["Apresentação · exemplo", "Comissão · exemplo", "Votação · pendente", "Sanção · pendente"] },

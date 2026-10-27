@@ -1,55 +1,61 @@
 # Ao Vivo Brasil
 
-Painel público em português-BR, construído com HTML, CSS e JavaScript nativos. Não há dependências de terceiros.
+Painel público em português-BR migrado para Next.js, React e Tailwind CSS. O projeto preserva o catálogo demonstrativo, os módulos temáticos, o mapa das UFs e a consulta de resultados eleitorais do TSE.
 
 ## Executar localmente
 
-Use Node.js 22.15 ou superior para servir a interface e o adaptador do TSE no mesmo endereço:
+Use Node.js 22.15 ou superior:
 
-```powershell
-node server.mjs
+```sh
+npm install
+npm run dev
 ```
 
-Abra [http://localhost:8000](http://localhost:8000). Encerre o servidor com `Ctrl+C`.
+Abra [http://localhost:3000](http://localhost:3000). Para gerar e iniciar a versão de produção:
+
+```sh
+npm run build
+npm start
+```
 
 ## Eleições 2026
 
-- A página está em `#eleicoes/segundo-turno`; as abrangências Brasil, UFs e Exterior são refletidas na URL.
-- `server.mjs` consulta os arquivos JSON públicos documentados pelo TSE, valida o turno e mantém cache e última resposta válida em memória.
-- Em deploys na Vercel, `api/eleicoes/segundo-turno.mjs` expõe o mesmo adaptador como função Node para que o painel carregue os resultados oficiais. A extensão `.mjs` deixa explícito o uso de módulos ES sem exigir `package.json`.
-- Os códigos `6257` (federal) e `6259` (estadual) são usados apenas para a referência oficial do primeiro turno. A relação de estados com disputa para governador é derivada dos arquivos do TSE; não está fixa no código.
-- A página mostra o resultado presidencial completo do primeiro turno e, para cada disputa estadual habilitada, os dois candidatos mais votados nessa rodada. No detalhe de cada UF, ficam disponíveis os totalizadores e a lista completa de candidaturas da eleição para governador. Os retratos presidenciais usam o arquivo nacional do TSE em todos os recortes; fotos de governador usam o arquivo estadual. Se uma foto não estiver disponível, aparecem as iniciais.
-- O mapa presidencial por UF é um componente de acompanhamento. Antes dos arquivos do segundo turno, o 0% é apenas demonstrativo da interface e fica identificado como não oficial; os votos e totalizadores da segunda rodada permanecem vazios.
-- O TSE ainda não publicou a identificação/arquivos de apuração do segundo turno no leiaute consultado. Por isso, os resultados dessa rodada permanecem vazios e rotulados; os dados do primeiro turno aparecem em blocos separados como referência.
-- Quando o TSE publicar os códigos oficiais do segundo turno, o servidor aceita `TSE_2026_SECOND_TURN_FEDERAL_CODE` e `TSE_2026_SECOND_TURN_STATE_CODE` no ambiente. A interface consulta a cada 45 segundos durante a apuração, pausa com a aba oculta e respeita o cache do servidor.
-- Os resultados do primeiro turno no Exterior são lidos do arquivo específico oficial de abrangência `zz`, sem substituir esses números pelo total nacional. O arquivo específico do segundo turno para Exterior ainda depende de publicação pelo TSE; o total nacional presidencial é apresentado separadamente pelo arquivo nacional.
-- A integração exige execução de Node.js: use `server.mjs` localmente ou uma função/server compatível em produção. Hospedagem puramente estática, como GitHub Pages, não executa o proxy nem a função da Vercel.
+- O painel fica em `#eleicoes/segundo-turno`; Brasil, UFs e Exterior são refletidos na URL.
+- A rota `src/app/api/eleicoes/segundo-turno/route.ts` usa o serviço `src/services/election-api.mjs` para validar a abrangência; `server.mjs` consulta os arquivos oficiais, mantém cache e preserva a última resposta válida.
+- Os códigos `6257` (federal) e `6259` (estadual) são usados como referência do primeiro turno. A relação de estados com disputa para governador é derivada dos arquivos do TSE.
+- O painel separa resultados oficiais do primeiro turno da apuração do segundo turno. O mapa presidencial por UF identifica os percentuais demonstrativos como não oficiais.
+- Quando o TSE publicar os códigos oficiais do segundo turno, configure `TSE_2026_SECOND_TURN_FEDERAL_CODE` e `TSE_2026_SECOND_TURN_STATE_CODE`. Durante a apuração, o painel consulta a cada 45 segundos, pausa com a aba oculta e respeita o cache do servidor.
+- O recorte Exterior usa o arquivo oficial específico do primeiro turno; ele não substitui nem duplica o total nacional.
 
-## Testes
+## Scripts
 
-```powershell
-node --test tests/elections.test.mjs
+```sh
+npm run dev
+npm run build
+npm start
+npm run lint
+npm test
 ```
 
-## Conteúdo e fontes
+## Fontes e conteúdo
 
 - [Resultados oficiais do TSE](https://resultados.tse.jus.br/oficial/app/index.html)
 - [Informações técnicas sobre a divulgação de resultados](https://www.tse.jus.br/eleicoes/informacoes-tecnicas-sobre-a-divulgacao-de-resultados)
 - [Resolução do calendário eleitoral de 2026](https://www.tse.jus.br/legislacao/compilada/res/2026/resolucao-no-23-750-de-26-de-fevereiro-de-2026)
-- Os indicadores econômicos e sociais seguem sem valores até a integração e validação de suas fontes. As pautas legislativas existentes são fictícias e identificadas como demonstração.
-- O mapa estadual existente é esquemático e não representa resultados eleitorais.
+- Os indicadores econômicos e sociais permanecem vazios até a integração e validação das fontes oficiais. As pautas legislativas são fictícias e estão identificadas como demonstração.
+- O mapa estadual é esquemático e não representa resultados eleitorais.
 
 ## Estrutura
 
-- `index.html`: estrutura semântica da aplicação.
-- `styles.css`: identidade visual, responsividade e estados acessíveis.
+- `src/app/`: páginas, componentes React, layout, rota do TSE e estilos globais.
 - `src/data.js`: catálogo de indicadores, propostas demonstrativas e UFs.
 - `src/state-map.js`: contornos simplificados das 27 UFs.
-- `src/app.js`: navegação, home, módulos e interface eleitoral.
-- `src/elections.js`: normalização, formatação, rotas e regras de estado da eleição.
-- `src/election-components.js`: fichas, totalizadores, pares de candidaturas e tabela de UFs.
-- `src/services/tse-results.js`: adaptador cliente para a API local.
-- `server.mjs`: servidor local e proxy/cache para os arquivos públicos do TSE.
-- `api/eleicoes/segundo-turno.mjs`: função Node da Vercel para a rota oficial de consulta usada pelo painel.
-- `vercel.json`: limites de execução das funções serverless.
-- `tests/elections.test.mjs`: testes nativos de Node.js para a página eleitoral.
+- `src/elections.js`: normalização, formatação, rotas e regras da eleição.
+- `src/election-components.js`: componentes React para os blocos de resultados eleitorais, fontes e metodologia.
+- `src/election-view.tsx`: composição React do painel de resultados eleitorais.
+- `src/services/tse-results.js`: cliente para a rota do TSE.
+- `src/services/election-api.mjs`: adaptador da rota da eleição.
+- `server.mjs`: consulta e cache em memória dos arquivos públicos do TSE.
+- `tests/elections.test.mjs`: testes das regras eleitorais.
+
+O Tailwind CSS v4 está habilitado por `@import "tailwindcss"` em `src/app/globals.css`.

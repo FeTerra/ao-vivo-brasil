@@ -1,13 +1,8 @@
-import { createServer } from "node:http";
 import tls from "node:tls";
-import { readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { dirname, extname, resolve, sep } from "node:path";
 import { states } from "./src/data.js";
 import {
   deriveGovernorRunoff,
   electionPhase,
-  normalizeElectionCoverage,
   normalizeTseResult,
 } from "./src/elections.js";
 
@@ -15,8 +10,6 @@ if (tls.getCACertificates && tls.setDefaultCACertificates) {
   tls.setDefaultCACertificates([...tls.rootCertificates, ...tls.getCACertificates("system")]);
 }
 
-const projectRoot = dirname(fileURLToPath(import.meta.url));
-const port = Number(process.env.PORT || 8000);
 const tseRoot = "https://resultados.tse.jus.br/oficial/ele2026";
 const firstRoundCodes = { federal: "6257", state: "6259" };
 const fileCache = new Map();
@@ -26,15 +19,6 @@ const snapshotRequests = new Map();
 const referenceCacheMs = 6 * 60 * 60 * 1000;
 const liveCacheMs = 45 * 1000;
 const snapshotCacheMs = 45 * 1000;
-
-function jsonResponse(response, statusCode, body) {
-  response.writeHead(statusCode, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "X-Content-Type-Options": "nosniff",
-  });
-  response.end(JSON.stringify(body));
-}
 
 function resultFileUrl(code, coverage, officeCode) {
   const place = coverage.toLowerCase();
@@ -305,82 +289,3 @@ export async function getElectionSnapshot(coverage, force = false) {
     snapshotRequests.delete(coverage);
   }
 }
-
-async function serveElectionApi(request, response, requestUrl) {
-  const coverage = normalizeElectionCoverage(requestUrl.searchParams.get("abrangencia") || "BR");
-  if (!coverage) {
-    jsonResponse(response, 400, { message: "Abrangência inválida. Informe Brasil, Exterior ou uma UF." });
-    return;
-  }
-
-  try {
-    const snapshot = await getElectionSnapshot(coverage, requestUrl.searchParams.get("atualizar") === "1");
-    jsonResponse(response, 200, snapshot);
-  } catch (error) {
-    jsonResponse(response, 502, {
-      status: "error",
-      message: "Não foi possível consultar os arquivos oficiais do TSE. Tente novamente.",
-      detail: error.message,
-      checkedAt: new Date().toISOString(),
-    });
-  }
-}
-
-async function serveStatic(request, response, pathname) {
-  const decodedPath = decodeURIComponent(pathname);
-  const relative = decodedPath === "/" ? "index.html" : decodedPath.replace(/^\/+/, "");
-  const allowed = relative === "index.html" || relative === "styles.css" || relative.startsWith("src/");
-  if (!allowed) {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Não encontrado.");
-    return;
-  }
-
-  const filePath = resolve(projectRoot, relative);
-  const sourceRoot = resolve(projectRoot, "src");
-  const isSourceAsset = filePath.startsWith(`${sourceRoot}${sep}`);
-  if (!filePath.startsWith(`${projectRoot}${sep}`) || (relative !== "index.html" && relative !== "styles.css" && !isSourceAsset)) {
-    response.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Acesso negado.");
-    return;
-  }
-
-  try {
-    const content = await readFile(filePath);
-    const mimeType = {
-      ".html": "text/html; charset=utf-8",
-      ".css": "text/css; charset=utf-8",
-      ".js": "text/javascript; charset=utf-8",
-      ".mjs": "text/javascript; charset=utf-8",
-    }[extname(filePath)] || "application/octet-stream";
-    response.writeHead(200, { "Content-Type": mimeType, "X-Content-Type-Options": "nosniff" });
-    response.end(content);
-  } catch {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    response.end("Não encontrado.");
-  }
-}
-
-const server = createServer(async (request, response) => {
-  if (request.method !== "GET" && request.method !== "HEAD") {
-    response.writeHead(405, { Allow: "GET, HEAD" });
-    response.end();
-    return;
-  }
-
-  const requestUrl = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
-  if (requestUrl.pathname === "/api/eleicoes/segundo-turno") {
-    await serveElectionApi(request, response, requestUrl);
-    return;
-  }
-  await serveStatic(request, response, requestUrl.pathname);
-});
-
-const entryFile = process.argv[1] ? resolve(process.argv[1]) : null;
-if (entryFile === fileURLToPath(import.meta.url)) {
-  server.listen(port, () => {
-    process.stdout.write(`Ao Vivo Brasil disponível em http://localhost:${port}\n`);
-  });
-}
-
-export { server };
